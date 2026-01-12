@@ -231,7 +231,7 @@ class AutoUpdater {
 // Create global instance
 // IMPORTANT: Replace with your GitHub username/repo after creating the repository
 // Example: window.autoUpdater = new AutoUpdater('1.0.0', 'pooh/vet-clinic-reminders');
-window.autoUpdater = new AutoUpdater('1.0.0', ''); // Add your repo here!
+window.autoUpdater = new AutoUpdater('1.0.0', 'pcd1999-afk/vet-clinic-reminders'); // Add your repo here!
 
 // Export for use in modules
 if (typeof module !== 'undefined' && module.exports) {
