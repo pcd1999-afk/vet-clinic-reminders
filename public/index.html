@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Holistic Vet Clinic - Appointment Reminder System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --vet-dark: #2c5f6f;
+            --vet-medium: #4a8fa0;
+            --vet-light: #7db3c3;
+            --healing-green: #6b9b7f;
+            --soft-cream: #f7f4ef;
+            --warm-coral: #e88873;
+            --shadow: rgba(44, 95, 111, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, var(--soft-cream) 0%, #e8f2f0 100%);
+            color: var(--vet-dark);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px var(--shadow);
+        }
+
+        h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 3rem;
+            font-weight: 300;
+            color: var(--vet-dark);
+            margin-bottom: 0.5rem;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: var(--vet-medium);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-weight: 300;
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background: var(--soft-cream);
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #dc3545;
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.connected {
+            background: var(--healing-green);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 968px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px var(--shadow);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 32px var(--shadow);
+        }
+
+        .card-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            font-weight: 400;
+            color: var(--vet-dark);
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--healing-green);
+            padding-bottom: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--vet-medium);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--soft-cream);
+            border-radius: 8px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            background: var(--soft-cream);
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--healing-green);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .btn {
+            padding: 0.875rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 16px var(--shadow);
+        }
+
+        .btn-primary {
+            background: var(--vet-dark);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--vet-medium);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--shadow);
+        }
+
+        .btn-secondary {
+            background: var(--healing-green);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a8a6f;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .appointment-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .appointment-item {
+            background: var(--soft-cream);
+            padding: 1.25rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--healing-green);
+            transition: all 0.3s;
+        }
+
+        .appointment-item:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 16px var(--shadow);
+        }
+
+        .appointment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 0.75rem;
+        }
+
+        .client-name {
+            font-weight: 600;
+            color: var(--vet-dark);
+            font-size: 1.1rem;
+        }
+
+        .appointment-date {
+            font-size: 0.85rem;
+            color: var(--vet-medium);
+            font-weight: 500;
+        }
+
+        .appointment-details {
+            font-size: 0.9rem;
+            color: var(--vet-medium);
+            line-height: 1.6;
+        }
+
+        .appointment-actions {
+            margin-top: 1rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+        }
+
+        .reminder-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--warm-coral);
+            color: white;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-top: 0.5rem;
+        }
+
+        .reminder-badge.sent {
+            background: var(--healing-green);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--vet-medium);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        #qrCode {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        #qrCode canvas {
+            margin: 1rem auto;
+            border: 4px solid var(--healing-green);
+            border-radius: 12px;
+        }
+
+        .instructions {
+            background: #fff9e6;
+            border-left: 4px solid var(--warm-coral);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .phone-input-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .phone-input-group select {
+            flex: 0 0 120px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--soft-cream);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--vet-dark);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--vet-medium);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 0.5rem;
+        }
+
+        /* Settings Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from { 
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to { 
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .close {
+            color: var(--vet-medium);
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .close:hover {
+            color: var(--vet-dark);
+        }
+
+        .settings-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.5rem 1rem;
+            background: var(--healing-green);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .settings-btn:hover {
+            background: #5a8a6f;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <button class="settings-btn" onclick="openSettings()">⚙️ Settings</button>
+            <h1>Holistic Vet Clinic</h1>
+            <div class="subtitle">Appointment Reminder System</div>
+            <div class="status-indicator">
+                <span class="status-dot" id="statusDot"></span>
+                <span id="statusText">Not Connected</span>
+            </div>
+        </header>
+
+        <div class="grid">
+            <!-- WhatsApp Connection -->
+            <div class="card">
+                <h2 class="card-title">WhatsApp Connection</h2>
+                <div id="connectionStatus">
+                    <button class="btn btn-primary" onclick="connectWhatsApp()">Connect WhatsApp</button>
+                    <div class="instructions">
+                        <strong>How to connect:</strong><br>
+                        1. Click "Connect WhatsApp" above<br>
+                        2. Scan the QR code with your phone<br>
+                        3. Open WhatsApp > Settings > Linked Devices<br>
+                        4. Tap "Link a Device" and scan the code
+                    </div>
+                </div>
+                <div id="qrCode" style="display: none;"></div>
+            </div>
+
+            <!-- Add New Appointment -->
+            <div class="card">
+                <h2 class="card-title">Add Appointment</h2>
+                <form id="appointmentForm">
+                    <div class="form-group">
+                        <label for="clientName">Pet Owner Name</label>
+                        <input type="text" id="clientName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="petName">Pet Name</label>
+                        <input type="text" id="petName" placeholder="e.g., Buddy" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="petType">Pet Type</label>
+                        <select id="petType">
+                            <option value="dog">Dog</option>
+                            <option value="cat">Cat</option>
+                            <option value="bird">Bird</option>
+                            <option value="rabbit">Rabbit</option>
+                            <option value="reptile">Reptile</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="clientPhone">Phone Number</label>
+                        <div class="phone-input-group">
+                            <select id="countryCode">
+                                <option value="+1">+1 (US)</option>
+                                <option value="+44">+44 (UK)</option>
+                                <option value="+91">+91 (IN)</option>
+                            </select>
+                            <input type="tel" id="clientPhone" placeholder="5551234567" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="appointmentDate">Appointment Date & Time</label>
+                        <input type="datetime-local" id="appointmentDate" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="serviceType">Service Type</label>
+                        <select id="serviceType">
+                            <option value="Wellness Exam">Wellness Exam</option>
+                            <option value="Acupuncture">Acupuncture</option>
+                            <option value="Chiropractic">Chiropractic</option>
+                            <option value="Herbal Consultation">Herbal Consultation</option>
+                            <option value="Physical Therapy">Physical Therapy</option>
+                            <option value="Nutritional Counseling">Nutritional Counseling</option>
+                            <option value="Surgery">Surgery</option>
+                            <option value="Follow-up Visit">Follow-up Visit</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reminderDays">Send Reminder</label>
+                        <select id="reminderDays">
+                            <option value="1">1 day before</option>
+                            <option value="2">2 days before</option>
+                            <option value="3">3 days before</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Add Appointment</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="card">
+            <h2 class="card-title">Overview</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalAppointments">0</div>
+                    <div class="stat-label">Total Appointments</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="upcomingCount">0</div>
+                    <div class="stat-label">Upcoming</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="remindersSent">0</div>
+                    <div class="stat-label">Reminders Sent</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Appointments -->
+        <div class="card">
+            <h2 class="card-title">Upcoming Appointments</h2>
+            <div class="appointment-list" id="appointmentList">
+                <div class="empty-state">
+                    <div class="empty-state-icon">📅</div>
+                    <p>No appointments scheduled yet</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeSettings()">&times;</span>
+            <h2 class="card-title">Message & Clinic Settings</h2>
+            
+            <div class="form-group">
+                <label for="clinicName">Clinic Name</label>
+                <input type="text" id="clinicName" placeholder="Holistic Vet Clinic">
+            </div>
+
+            <div class="form-group">
+                <label for="clinicAddress">Clinic Address</label>
+                <input type="text" id="clinicAddress" placeholder="123 Main St, Your City, ST 12345">
+            </div>
+
+            <div class="form-group">
+                <label for="messageTemplate">Message Template</label>
+                <textarea id="messageTemplate" rows="10" placeholder="Use these placeholders:
+{ownerName} - Pet owner's name
+{petName} - Pet's name
+{petType} - Type of pet (dog, cat, etc.)
+{service} - Service type
+{date} - Appointment date
+{time} - Appointment time
+{address} - Clinic address"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Preview:</label>
+                <div id="messagePreview" style="background: var(--soft-cream); padding: 1rem; border-radius: 8px; white-space: pre-wrap; font-size: 0.9rem;">
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+            <button class="btn btn-secondary" onclick="resetToDefault()" style="margin-left: 0.5rem;">Reset to Default</button>
+        </div>
+    </div>
+
+    <script>
+        // Simulated state (in production, this would connect to a real backend)
+        let appointments = [];
+        let whatsappConnected = false;
+        let remindersSentCount = 0;
+
+        // Default settings
+        let settings = {
+            clinicName: 'Holistic Vet Clinic',
+            clinicAddress: '123 Main Street, Your City, ST 12345',
+            messageTemplate: `Hello {ownerName}! 🐾
+
+This is a friendly reminder that you have an appointment at {clinicName} tomorrow for {petName}.
+
+📅 Date: {date}
+⏰ Time: {time}
+🏥 Service: {service}
+📍 Location: {address}
+
+We look forward to providing compassionate, holistic care for your {petType}. If you need to reschedule, please let us know as soon as possible.
+
+See you soon!`
+        };
+
+        // Load settings from localStorage
+        function loadSettings() {
+            const stored = localStorage.getItem('clinicSettings');
+            if (stored) {
+                settings = JSON.parse(stored);
+            }
+        }
+
+        // Save settings to localStorage
+        function saveSettingsToStorage() {
+            localStorage.setItem('clinicSettings', JSON.stringify(settings));
+        }
+
+        // Open settings modal
+        function openSettings() {
+            document.getElementById('clinicName').value = settings.clinicName;
+            document.getElementById('clinicAddress').value = settings.clinicAddress;
+            document.getElementById('messageTemplate').value = settings.messageTemplate;
+            updateMessagePreview();
+            document.getElementById('settingsModal').style.display = 'block';
+        }
+
+        // Close settings modal
+        function closeSettings() {
+            document.getElementById('settingsModal').style.display = 'none';
+        }
+
+        // Save settings
+        function saveSettings() {
+            settings.clinicName = document.getElementById('clinicName').value;
+            settings.clinicAddress = document.getElementById('clinicAddress').value;
+            settings.messageTemplate = document.getElementById('messageTemplate').value;
+            saveSettingsToStorage();
+            alert('Settings saved successfully!');
+            closeSettings();
+        }
+
+        // Reset to default
+        function resetToDefault() {
+            if (confirm('Are you sure you want to reset to default message template?')) {
+                settings.messageTemplate = `Hello {ownerName}! 🐾
+
+This is a friendly reminder that you have an appointment at {clinicName} tomorrow for {petName}.
+
+📅 Date: {date}
+⏰ Time: {time}
+🏥 Service: {service}
+📍 Location: {address}
+
+We look forward to providing compassionate, holistic care for your {petType}. If you need to reschedule, please let us know as soon as possible.
+
+See you soon!`;
+                document.getElementById('messageTemplate').value = settings.messageTemplate;
+                updateMessagePreview();
+            }
+        }
+
+        // Update message preview
+        function updateMessagePreview() {
+            const template = document.getElementById('messageTemplate').value;
+            const preview = template
+                .replace(/{ownerName}/g, 'John Smith')
+                .replace(/{petName}/g, 'Buddy')
+                .replace(/{petType}/g, 'dog')
+                .replace(/{service}/g, 'Wellness Exam')
+                .replace(/{date}/g, 'January 25, 2024')
+                .replace(/{time}/g, '2:00 PM')
+                .replace(/{clinicName}/g, settings.clinicName)
+                .replace(/{address}/g, settings.clinicAddress);
+            
+            document.getElementById('messagePreview').textContent = preview;
+        }
+
+        // Update preview when template changes
+        document.addEventListener('DOMContentLoaded', function() {
+            const templateInput = document.getElementById('messageTemplate');
+            if (templateInput) {
+                templateInput.addEventListener('input', updateMessagePreview);
+            }
+        });
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('settingsModal');
+            if (event.target == modal) {
+                closeSettings();
+            }
+        }
+
+        // Load appointments from localStorage
+        function loadAppointments() {
+            const stored = localStorage.getItem('appointments');
+            if (stored) {
+                appointments = JSON.parse(stored);
+                renderAppointments();
+                updateStats();
+            }
+        }
+
+        // Save appointments to localStorage
+        function saveAppointments() {
+            localStorage.setItem('appointments', JSON.stringify(appointments));
+        }
+
+        // Simulate WhatsApp connection
+        function connectWhatsApp() {
+            const qrDiv = document.getElementById('qrCode');
+            const statusDiv = document.getElementById('connectionStatus');
+            
+            qrDiv.style.display = 'block';
+            qrDiv.innerHTML = `
+                <p style="color: var(--vet-medium); margin-bottom: 1rem;">
+                    Generating QR Code...
+                </p>
+                <div style="width: 256px; height: 256px; background: var(--soft-cream); margin: 0 auto; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 4rem;">
+                    📱
+                </div>
+                <p style="color: var(--vet-medium); margin-top: 1rem; font-size: 0.9rem;">
+                    In a real implementation, a QR code would appear here.<br>
+                    For this prototype, we'll simulate the connection.
+                </p>
+                <button class="btn btn-secondary" style="margin-top: 1rem;" onclick="simulateConnection()">
+                    Simulate Connection
+                </button>
+            `;
+        }
+
+        function simulateConnection() {
+            whatsappConnected = true;
+            document.getElementById('statusDot').classList.add('connected');
+            document.getElementById('statusText').textContent = 'Connected to WhatsApp';
+            document.getElementById('qrCode').innerHTML = `
+                <p style="color: var(--healing-green); font-weight: 600;">✓ Successfully Connected!</p>
+                <p style="color: var(--vet-medium); margin-top: 0.5rem; font-size: 0.9rem;">
+                    You can now send automated reminders
+                </p>
+            `;
+        }
+
+        // Handle form submission
+        document.getElementById('appointmentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const appointment = {
+                id: Date.now(),
+                clientName: document.getElementById('clientName').value,
+                petName: document.getElementById('petName').value,
+                petType: document.getElementById('petType').value,
+                clientPhone: document.getElementById('countryCode').value + document.getElementById('clientPhone').value,
+                appointmentDate: document.getElementById('appointmentDate').value,
+                serviceType: document.getElementById('serviceType').value,
+                reminderDays: parseInt(document.getElementById('reminderDays').value),
+                reminderSent: false,
+                createdAt: new Date().toISOString()
+            };
+
+            appointments.push(appointment);
+            appointments.sort((a, b) => new Date(a.appointmentDate) - new Date(b.appointmentDate));
+            
+            saveAppointments();
+            renderAppointments();
+            updateStats();
+            
+            // Reset form
+            e.target.reset();
+            
+            // Show success message
+            alert('Appointment added successfully!');
+        });
+
+        function renderAppointments() {
+            const listDiv = document.getElementById('appointmentList');
+            
+            if (appointments.length === 0) {
+                listDiv.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📅</div>
+                        <p>No appointments scheduled yet</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const now = new Date();
+            const upcoming = appointments.filter(apt => new Date(apt.appointmentDate) > now);
+
+            listDiv.innerHTML = upcoming.map(apt => {
+                const aptDate = new Date(apt.appointmentDate);
+                const daysUntil = Math.ceil((aptDate - now) / (1000 * 60 * 60 * 24));
+                
+                return `
+                    <div class="appointment-item">
+                        <div class="appointment-header">
+                            <div>
+                                <div class="client-name">${apt.clientName} - ${apt.petName} (${apt.petType})</div>
+                                <div class="appointment-date">
+                                    ${aptDate.toLocaleDateString()} at ${aptDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="appointment-details">
+                            <strong>Pet:</strong> ${apt.petName} (${apt.petType})<br>
+                            <strong>Service:</strong> ${apt.serviceType}<br>
+                            <strong>Phone:</strong> ${apt.clientPhone}<br>
+                            <strong>Days until:</strong> ${daysUntil} day${daysUntil !== 1 ? 's' : ''}
+                        </div>
+                        ${apt.reminderSent ? 
+                            '<span class="reminder-badge sent">✓ Reminder Sent</span>' :
+                            `<span class="reminder-badge">Reminder ${apt.reminderDays} days before</span>`
+                        }
+                        <div class="appointment-actions">
+                            <button class="btn btn-secondary btn-small" onclick="sendReminder(${apt.id})">
+                                Send Reminder Now
+                            </button>
+                            <button class="btn btn-danger btn-small" onclick="deleteAppointment(${apt.id})">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function sendReminder(id) {
+            if (!whatsappConnected) {
+                alert('Please connect to WhatsApp first!');
+                return;
+            }
+
+            const appointment = appointments.find(apt => apt.id === id);
+            if (!appointment) return;
+
+            const aptDate = new Date(appointment.appointmentDate);
+            
+            // Format the message using the template
+            const message = settings.messageTemplate
+                .replace(/{ownerName}/g, appointment.clientName)
+                .replace(/{petName}/g, appointment.petName)
+                .replace(/{petType}/g, appointment.petType)
+                .replace(/{service}/g, appointment.serviceType)
+                .replace(/{date}/g, aptDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }))
+                .replace(/{time}/g, aptDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }))
+                .replace(/{clinicName}/g, settings.clinicName)
+                .replace(/{address}/g, settings.clinicAddress);
+
+            // In a real implementation, this would send via WhatsApp
+            console.log('Sending message to', appointment.clientPhone, ':', message);
+            
+            appointment.reminderSent = true;
+            remindersSentCount++;
+            saveAppointments();
+            renderAppointments();
+            updateStats();
+            
+            alert('Reminder sent successfully!\n\nMessage preview:\n' + message);
+        }
+
+        function deleteAppointment(id) {
+            if (confirm('Are you sure you want to delete this appointment?')) {
+                appointments = appointments.filter(apt => apt.id !== id);
+                saveAppointments();
+                renderAppointments();
+                updateStats();
+            }
+        }
+
+        function updateStats() {
+            const now = new Date();
+            const upcoming = appointments.filter(apt => new Date(apt.appointmentDate) > now);
+            const sent = appointments.filter(apt => apt.reminderSent).length;
+
+            document.getElementById('totalAppointments').textContent = appointments.length;
+            document.getElementById('upcomingCount').textContent = upcoming.length;
+            document.getElementById('remindersSent').textContent = sent;
+        }
+
+        // Check for reminders that need to be sent (would run on a schedule)
+        function checkReminders() {
+            const now = new Date();
+            
+            appointments.forEach(apt => {
+                if (apt.reminderSent) return;
+                
+                const aptDate = new Date(apt.appointmentDate);
+                const daysUntil = Math.ceil((aptDate - now) / (1000 * 60 * 60 * 24));
+                
+                if (daysUntil <= apt.reminderDays && whatsappConnected) {
+                    // In production, this would automatically send
+                    console.log('Would send reminder for:', apt.clientName);
+                }
+            });
+        }
+
+        // Initialize
+        loadSettings();
+        loadAppointments();
+        
+        // Check reminders every hour (in production, this would be server-side)
+        setInterval(checkReminders, 60 * 60 * 1000);
+    </script>
+</body>
+</html>

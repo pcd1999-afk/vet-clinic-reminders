@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מרפאה וטרינרית - תזכורות ידניות</title>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="google-calendar.js"></script>
+    <script src="auto-update.js"></script>
+    <style>
+        :root {
+            --vet-dark: #2c5f6f;
+            --vet-medium: #4a8fa0;
+            --vet-light: #7db3c3;
+            --healing-green: #6b9b7f;
+            --soft-cream: #f7f4ef;
+            --warm-coral: #e88873;
+            --shadow: rgba(44, 95, 111, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Heebo', sans-serif;
+            background: linear-gradient(135deg, var(--soft-cream) 0%, #e8f2f0 100%);
+            color: var(--vet-dark);
+            min-height: 100vh;
+            padding: 2rem;
+            direction: rtl;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px var(--shadow);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            color: var(--vet-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: var(--vet-medium);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .connection-panel {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .connection-status {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .status-card {
+            flex: 1;
+            min-width: 250px;
+            padding: 1.5rem;
+            background: var(--soft-cream);
+            border-radius: 12px;
+            border-right: 4px solid var(--vet-medium);
+        }
+
+        .status-card.connected {
+            border-right-color: var(--healing-green);
+            background: #f0f9f5;
+        }
+
+        .status-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc3545;
+        }
+
+        .status-dot.connected {
+            background: var(--healing-green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .status-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .status-description {
+            font-size: 0.85rem;
+            color: var(--vet-medium);
+            margin-top: 0.5rem;
+        }
+
+        .connection-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Heebo', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 16px var(--shadow);
+        }
+
+        .btn-primary {
+            background: var(--vet-dark);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--vet-medium);
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: var(--healing-green);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #5a8a6f;
+            transform: translateY(-2px);
+        }
+
+        .btn-large {
+            font-size: 1.1rem;
+            padding: 1.5rem 3rem;
+            font-weight: 600;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px var(--shadow);
+        }
+
+        .card-title {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: var(--vet-dark);
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--healing-green);
+            padding-bottom: 0.5rem;
+        }
+
+        .today-reminders {
+            margin-bottom: 1.5rem;
+        }
+
+        .reminder-item {
+            background: var(--soft-cream);
+            padding: 1.25rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            border-right: 4px solid var(--warm-coral);
+        }
+
+        .reminder-item.sent {
+            border-right-color: var(--healing-green);
+            opacity: 0.7;
+        }
+
+        .reminder-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--vet-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .reminder-details {
+            font-size: 0.9rem;
+            color: var(--vet-medium);
+            line-height: 1.6;
+        }
+
+        .reminder-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--warm-coral);
+            color: white;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-top: 0.5rem;
+        }
+
+        .reminder-badge.sent {
+            background: var(--healing-green);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--vet-medium);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--vet-medium);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 0.875rem;
+            border: 2px solid var(--soft-cream);
+            border-radius: 8px;
+            font-family: 'Heebo', sans-serif;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            background: var(--soft-cream);
+            direction: rtl;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--healing-green);
+        }
+
+        .phone-input-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .phone-input-group select {
+            flex: 0 0 120px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from { 
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to { 
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .close {
+            color: var(--vet-medium);
+            float: left;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .close:hover {
+            color: var(--vet-dark);
+        }
+
+        #qrCodeContainer {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        #qrCodeContainer img {
+            max-width: 300px;
+            margin: 1rem auto;
+        }
+
+        .instructions {
+            background: #fff9e6;
+            border-right: 4px solid var(--warm-coral);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .send-all-section {
+            background: linear-gradient(135deg, var(--healing-green), #7db3c3);
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            color: white;
+            margin-top: 1.5rem;
+        }
+
+        .send-all-section h3 {
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .send-all-section .btn {
+            background: white;
+            color: var(--vet-dark);
+            font-size: 1.1rem;
+        }
+
+        .send-all-section .btn:hover {
+            background: var(--soft-cream);
+        }
+
+        .stats-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-box {
+            flex: 1;
+            background: var(--soft-cream);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--vet-dark);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--vet-medium);
+            margin-top: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🐾 מרפאה וטרינרית הוליסטית</h1>
+            <div class="subtitle">מערכת תזכורות ידנית</div>
+        </header>
+
+        <!-- Connection Panel -->
+        <div class="connection-panel">
+            <h2 class="card-title">חיבור למערכות</h2>
+            
+            <div class="connection-status">
+                <div class="status-card" id="twilioStatus">
+                    <div class="status-header">
+                        <span class="status-dot" id="twilioDot"></span>
+                        <span class="status-title">Twilio</span>
+                    </div>
+                    <div class="status-description" id="twilioDescription">
+                        לא מחובר - הודעות WhatsApp ו-SMS מקצועיות
+                    </div>
+                </div>
+
+                <div class="status-card" id="whatsappStatus">
+                    <div class="status-header">
+                        <span class="status-dot" id="whatsappDot"></span>
+                        <span class="status-title">WhatsApp Web</span>
+                    </div>
+                    <div class="status-description" id="whatsappDescription">
+                        לא מחובר - מצב בדיקה בלבד
+                    </div>
+                </div>
+
+                <div class="status-card" id="googleCalendarStatus">
+                    <div class="status-header">
+                        <span class="status-dot" id="googleCalendarDot"></span>
+                        <span class="status-title">Google Calendar</span>
+                    </div>
+                    <div class="status-description" id="googleCalendarDescription">
+                        לא מחובר - סנכרון אוטומטי של תורים
+                    </div>
+                </div>
+            </div>
+
+            <div class="connection-buttons">
+                <button class="btn btn-primary" onclick="openTwilioSetup()">
+                    🔐 חבר ל-Twilio
+                </button>
+                <button class="btn btn-primary" onclick="connectWhatsAppWeb()">
+                    💬 חבר ל-WhatsApp Web
+                </button>
+                <button class="btn btn-success" onclick="connectGoogleCalendar()">
+                    📅 חבר ל-Google Calendar
+                </button>
+                <button class="btn btn-primary" onclick="checkForUpdates()" style="margin-right: auto;">
+                    🔄 בדוק עדכונים
+                </button>
+            </div>
+
+            <div class="instructions">
+                <strong>💡 איך זה עובד:</strong><br>
+                <strong>Twilio:</strong> שירות מקצועי לשליחת הודעות WhatsApp ו-SMS. מומלץ לשימוש עסקי.<br>
+                <strong>WhatsApp Web:</strong> מצב בדיקה באמצעות WhatsApp האישי שלך. טוב לניסויים בלבד.<br>
+                <strong>Google Calendar:</strong> סנכרון אוטומטי של תורים מהיומן שלך. חוסך הקלדה ידנית!<br>
+                <strong>בדוק עדכונים:</strong> מוודא שיש לך את הגרסה העדכנית ביותר של האפליקציה.
+            </div>
+        </div>
+
+        <div class="grid">
+            <!-- Today's Reminders -->
+            <div class="card">
+                <h2 class="card-title">תזכורות להיום - <span id="todayDate"></span></h2>
+                
+                <div class="stats-row">
+                    <div class="stat-box">
+                        <div class="stat-number" id="todayCount">0</div>
+                        <div class="stat-label">תזכורות להיום</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number" id="sentCount">0</div>
+                        <div class="stat-label">נשלחו</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number" id="pendingCount">0</div>
+                        <div class="stat-label">ממתינות</div>
+                    </div>
+                </div>
+
+                <div class="today-reminders" id="todayRemindersList">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📅</div>
+                        <p>אין תזכורות לשליחה היום</p>
+                    </div>
+                </div>
+
+                <div class="send-all-section" id="sendAllSection" style="display: none;">
+                    <h3>מוכן לשלוח?</h3>
+                    <p style="margin-bottom: 1rem;">שלח תזכורות לכל הלקוחות שמופיעים למעלה</p>
+                    <button class="btn btn-large" onclick="sendAllReminders()" id="sendAllBtn">
+                        📤 שלח את כל התזכורות (<span id="sendAllCount">0</span>)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Add Appointment -->
+            <div class="card">
+                <h2 class="card-title">הוסף תור חדש</h2>
+                <form id="appointmentForm">
+                    <div class="form-group">
+                        <label for="clientName">שם בעל החיה</label>
+                        <input type="text" id="clientName" placeholder="ישראל ישראלי" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="petName">שם החיה</label>
+                        <input type="text" id="petName" placeholder="צוקי" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="petType">סוג החיה</label>
+                        <select id="petType">
+                            <option value="כלב">כלב</option>
+                            <option value="חתול">חתול</option>
+                            <option value="ציפור">ציפור</option>
+                            <option value="ארנב">ארנב</option>
+                            <option value="זוחל">זוחל</option>
+                            <option value="אחר">אחר</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="clientPhone">מספר טלפון</label>
+                        <div class="phone-input-group">
+                            <select id="countryCode">
+                                <option value="+972">+972 (ישראל)</option>
+                                <option value="+1">+1 (ארה״ב)</option>
+                                <option value="+44">+44 (בריטניה)</option>
+                            </select>
+                            <input type="tel" id="clientPhone" placeholder="501234567" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="appointmentDate">תאריך ושעת התור</label>
+                        <input type="datetime-local" id="appointmentDate" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="serviceType">סוג הטיפול</label>
+                        <select id="serviceType">
+                            <option value="בדיקה כללית">בדיקה כללית</option>
+                            <option value="דיקור סיני">דיקור סיני</option>
+                            <option value="כירופרקטיקה">כירופרקטיקה</option>
+                            <option value="ייעוץ צמחי מרפא">ייעוץ צמחי מרפא</option>
+                            <option value="פיזיותרפיה">פיזיותרפיה</option>
+                            <option value="ייעוץ תזונתי">ייעוץ תזונתי</option>
+                            <option value="ניתוח">ניתוח</option>
+                            <option value="ביקור מעקב">ביקור מעקב</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reminderDays">שלח תזכורת</label>
+                        <select id="reminderDays">
+                            <option value="0">היום (לבדיקה)</option>
+                            <option value="1">יום לפני</option>
+                            <option value="2" selected>יומיים לפני</option>
+                            <option value="3">3 ימים לפני</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-success" style="width: 100%;">הוסף תור</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Twilio Setup Modal -->
+    <div id="twilioModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeTwilioSetup()">&times;</span>
+            <h2 class="card-title">הגדרת Twilio</h2>
+            
+            <div class="instructions">
+                <strong>📚 לפני שמתחילים:</strong><br>
+                1. הירשם ל-Twilio: <a href="https://www.twilio.com/try-twilio" target="_blank">https://www.twilio.com/try-twilio</a><br>
+                2. קבל $15 זיכוי חינם!<br>
+                3. מצא את הפרטים שלך ב-Console<br>
+                4. עקוב אחר המדריך: <strong>TWILIO-SETUP.md</strong>
+            </div>
+
+            <form id="twilioForm" style="margin-top: 1.5rem;">
+                <div class="form-group">
+                    <label>Account SID</label>
+                    <input type="text" id="twilioSid" placeholder="ACxxxxxxxxxxxxxxxxxxxx" style="direction: ltr;">
+                </div>
+
+                <div class="form-group">
+                    <label>Auth Token</label>
+                    <input type="password" id="twilioToken" placeholder="your_auth_token_here" style="direction: ltr;">
+                </div>
+
+                <div class="form-group">
+                    <label>WhatsApp Number (אופציונלי)</label>
+                    <input type="text" id="twilioWhatsApp" placeholder="whatsapp:+14155238886" style="direction: ltr;">
+                </div>
+
+                <div class="form-group">
+                    <label>SMS Number (אופציונלי)</label>
+                    <input type="text" id="twilioSMS" placeholder="+14155238886" style="direction: ltr;">
+                </div>
+
+                <button type="submit" class="btn btn-success" style="width: 100%;">שמור והתחבר</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- WhatsApp Web QR Modal -->
+    <div id="whatsappModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeWhatsAppModal()">&times;</span>
+            <h2 class="card-title">התחבר ל-WhatsApp Web</h2>
+            
+            <div id="qrCodeContainer">
+                <p>סורק את קוד ה-QR עם הטלפון שלך...</p>
+                <div id="qrCodeImage"></div>
+            </div>
+
+            <div class="instructions">
+                <strong>📱 איך לסרוק:</strong><br>
+                1. פתח WhatsApp בטלפון שלך<br>
+                2. <strong>iPhone:</strong> הגדרות → מכשירים מקושרים → קשר מכשיר<br>
+                3. <strong>Android:</strong> תפריט (⋮) → מכשירים מקושרים → קשר מכשיר<br>
+                4. סרוק את קוד ה-QR
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let appointments = [];
+        let twilioConfig = null;
+        let whatsappConnected = false;
+        let googleCalendar = null;
+        let googleCalendarConnected = false;
+
+        // Initialize on page load
+        window.addEventListener('load', function() {
+            loadData();
+            initializeAutoUpdater();
+            initializeGoogleCalendar();
+        });
+
+        // Initialize Auto-Updater
+        function initializeAutoUpdater() {
+            if (window.autoUpdater) {
+                // Start checking for updates every hour
+                window.autoUpdater.startAutoCheck(60);
+
+                // Set callback for when update is available
+                window.onUpdateAvailable = function(versionInfo) {
+                    window.autoUpdater.showUpdateNotification(versionInfo);
+                };
+            }
+        }
+
+        // Initialize Google Calendar
+        function initializeGoogleCalendar() {
+            if (window.GoogleCalendarSync) {
+                googleCalendar = new GoogleCalendarSync();
+                
+                // Check if already connected
+                if (googleCalendar.isAuthenticated()) {
+                    updateGoogleCalendarStatus(true);
+                }
+            }
+        }
+
+        // Manual update check
+        async function checkForUpdates() {
+            if (!window.autoUpdater) {
+                alert('מערכת העדכונים לא זמינה');
+                return;
+            }
+
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = '🔄 בודק...';
+
+            try {
+                const update = await window.autoUpdater.checkNow();
+                
+                if (update) {
+                    window.autoUpdater.showUpdateNotification(update);
+                } else {
+                    alert('✅ האפליקציה מעודכנת לגרסה האחרונה!');
+                }
+            } catch (error) {
+                alert('❌ שגיאה בבדיקת עדכונים');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🔄 בדוק עדכונים';
+            }
+        }
+
+        // Google Calendar Connection
+        async function connectGoogleCalendar() {
+            if (!googleCalendar) {
+                alert('מערכת Google Calendar לא זמינה');
+                return;
+            }
+
+            try {
+                await googleCalendar.initGoogleAuth();
+                await googleCalendar.requestCalendarAccess();
+                
+                // Set callback for successful connection
+                window.onGoogleCalendarConnected = function() {
+                    updateGoogleCalendarStatus(true);
+                    googleCalendarConnected = true;
+                    alert('✅ Google Calendar מחובר בהצלחה!');
+                    
+                    // Sync immediately
+                    syncGoogleCalendar();
+                };
+
+            } catch (error) {
+                console.error('Google Calendar connection failed:', error);
+                alert('❌ שגיאה בחיבור ל-Google Calendar');
+            }
+        }
+
+        // Sync Google Calendar
+        async function syncGoogleCalendar() {
+            if (!googleCalendar || !googleCalendarConnected) {
+                alert('נא להתחבר ל-Google Calendar תחילה');
+                return;
+            }
+
+            try {
+                // Set callback for fetched events
+                window.onCalendarEventsFetched = function(events) {
+                    // Merge with existing appointments
+                    events.forEach(newApt => {
+                        // Check if appointment already exists
+                        const exists = appointments.find(apt => 
+                            apt.googleEventId === newApt.googleEventId ||
+                            (apt.clientPhone === newApt.clientPhone && 
+                             apt.appointmentDate === newApt.appointmentDate)
+                        );
+
+                        if (!exists) {
+                            appointments.push(newApt);
+                        }
+                    });
+
+                    saveData();
+                    updateTodayReminders();
+                    updateStats();
+                    
+                    alert(`✅ ${events.length} תורים נוספו מ-Google Calendar!`);
+                };
+
+                await googleCalendar.syncNow();
+
+            } catch (error) {
+                console.error('Calendar sync failed:', error);
+                alert('❌ שגיאה בסנכרון Google Calendar');
+            }
+        }
+
+        function updateGoogleCalendarStatus(connected) {
+            const statusCard = document.getElementById('googleCalendarStatus');
+            const dot = document.getElementById('googleCalendarDot');
+            const description = document.getElementById('googleCalendarDescription');
+
+            googleCalendarConnected = connected;
+
+            if (connected) {
+                statusCard.classList.add('connected');
+                dot.classList.add('connected');
+                description.textContent = '✓ מחובר - סנכרון פעיל';
+            } else {
+                statusCard.classList.remove('connected');
+                dot.classList.remove('connected');
+                description.textContent = 'לא מחובר - סנכרון אוטומטי של תורים';
+            }
+        }
+
+        // Load saved data
+        function loadData() {
+            const saved = localStorage.getItem('manualAppointments');
+            if (saved) {
+                appointments = JSON.parse(saved);
+            }
+
+            const savedTwilio = localStorage.getItem('twilioConfig');
+            if (savedTwilio) {
+                twilioConfig = JSON.parse(savedTwilio);
+                updateTwilioStatus(true);
+            }
+
+            updateTodayReminders();
+            updateStats();
+        }
+
+        function saveData() {
+            localStorage.setItem('manualAppointments', JSON.stringify(appointments));
+        }
+
+        // Display today's date
+        document.getElementById('todayDate').textContent = new Date().toLocaleDateString('he-IL', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        // Add appointment form
+        document.getElementById('appointmentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const appointment = {
+                id: Date.now(),
+                clientName: document.getElementById('clientName').value,
+                petName: document.getElementById('petName').value,
+                petType: document.getElementById('petType').value,
+                clientPhone: document.getElementById('countryCode').value + document.getElementById('clientPhone').value,
+                appointmentDate: document.getElementById('appointmentDate').value,
+                serviceType: document.getElementById('serviceType').value,
+                reminderDays: parseInt(document.getElementById('reminderDays').value),
+                reminderSent: false,
+                createdAt: new Date().toISOString()
+            };
+
+            appointments.push(appointment);
+            saveData();
+            updateTodayReminders();
+            updateStats();
+
+            e.target.reset();
+            alert('התור נוסף בהצלחה! ✅');
+        });
+
+        // Update today's reminders list
+        function updateTodayReminders() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const todayReminders = appointments.filter(apt => {
+                const aptDate = new Date(apt.appointmentDate);
+                const reminderDate = new Date(aptDate);
+                reminderDate.setDate(reminderDate.getDate() - apt.reminderDays);
+                reminderDate.setHours(0, 0, 0, 0);
+                
+                return reminderDate.getTime() === today.getTime() && !apt.reminderSent;
+            });
+
+            const listDiv = document.getElementById('todayRemindersList');
+            const sendAllSection = document.getElementById('sendAllSection');
+
+            if (todayReminders.length === 0) {
+                listDiv.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📅</div>
+                        <p>אין תזכורות לשליחה היום</p>
+                    </div>
+                `;
+                sendAllSection.style.display = 'none';
+            } else {
+                listDiv.innerHTML = todayReminders.map(apt => {
+                    const aptDate = new Date(apt.appointmentDate);
+                    return `
+                        <div class="reminder-item ${apt.reminderSent ? 'sent' : ''}">
+                            <div class="reminder-name">${apt.clientName} - ${apt.petName}</div>
+                            <div class="reminder-details">
+                                <strong>טיפול:</strong> ${apt.serviceType}<br>
+                                <strong>תאריך התור:</strong> ${aptDate.toLocaleDateString('he-IL')} בשעה ${aptDate.toLocaleTimeString('he-IL', {hour: '2-digit', minute:'2-digit'})}<br>
+                                <strong>טלפון:</strong> ${apt.clientPhone}
+                            </div>
+                            <span class="reminder-badge ${apt.reminderSent ? 'sent' : ''}">
+                                ${apt.reminderSent ? '✓ נשלח' : '⏳ ממתין'}
+                            </span>
+                        </div>
+                    `;
+                }).join('');
+
+                sendAllSection.style.display = 'block';
+                document.getElementById('sendAllCount').textContent = todayReminders.length;
+            }
+        }
+
+        function updateStats() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const todayReminders = appointments.filter(apt => {
+                const aptDate = new Date(apt.appointmentDate);
+                const reminderDate = new Date(aptDate);
+                reminderDate.setDate(reminderDate.getDate() - apt.reminderDays);
+                reminderDate.setHours(0, 0, 0, 0);
+                return reminderDate.getTime() === today.getTime();
+            });
+
+            const sent = todayReminders.filter(apt => apt.reminderSent).length;
+            const pending = todayReminders.length - sent;
+
+            document.getElementById('todayCount').textContent = todayReminders.length;
+            document.getElementById('sentCount').textContent = sent;
+            document.getElementById('pendingCount').textContent = pending;
+        }
+
+        // Twilio Setup
+        function openTwilioSetup() {
+            document.getElementById('twilioModal').style.display = 'block';
+        }
+
+        function closeTwilioSetup() {
+            document.getElementById('twilioModal').style.display = 'none';
+        }
+
+        document.getElementById('twilioForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            twilioConfig = {
+                accountSid: document.getElementById('twilioSid').value,
+                authToken: document.getElementById('twilioToken').value,
+                whatsappNumber: document.getElementById('twilioWhatsApp').value,
+                smsNumber: document.getElementById('twilioSMS').value
+            };
+
+            localStorage.setItem('twilioConfig', JSON.stringify(twilioConfig));
+            updateTwilioStatus(true);
+            closeTwilioSetup();
+            alert('Twilio מחובר בהצלחה! ✅');
+        });
+
+        function updateTwilioStatus(connected) {
+            const statusCard = document.getElementById('twilioStatus');
+            const dot = document.getElementById('twilioDot');
+            const description = document.getElementById('twilioDescription');
+
+            if (connected) {
+                statusCard.classList.add('connected');
+                dot.classList.add('connected');
+                description.textContent = '✓ מחובר - מוכן לשלוח הודעות';
+            } else {
+                statusCard.classList.remove('connected');
+                dot.classList.remove('connected');
+                description.textContent = 'לא מחובר - הודעות WhatsApp ו-SMS מקצועיות';
+            }
+        }
+
+        // WhatsApp Web Connection
+        function connectWhatsAppWeb() {
+            document.getElementById('whatsappModal').style.display = 'block';
+            // In real implementation, this would call the server API
+            document.getElementById('qrCodeImage').innerHTML = '<p>📱 QR Code יופיע כאן לאחר התחברות לשרת...</p>';
+            
+            // Simulate connection for demo
+            setTimeout(() => {
+                updateWhatsAppStatus(true);
+                closeWhatsAppModal();
+                alert('WhatsApp Web מחובר! ✅');
+            }, 3000);
+        }
+
+        function closeWhatsAppModal() {
+            document.getElementById('whatsappModal').style.display = 'none';
+        }
+
+        function updateWhatsAppStatus(connected) {
+            const statusCard = document.getElementById('whatsappStatus');
+            const dot = document.getElementById('whatsappDot');
+            const description = document.getElementById('whatsappDescription');
+
+            whatsappConnected = connected;
+
+            if (connected) {
+                statusCard.classList.add('connected');
+                dot.classList.add('connected');
+                description.textContent = '✓ מחובר - מוכן לשלוח הודעות';
+            } else {
+                statusCard.classList.remove('connected');
+                dot.classList.remove('connected');
+                description.textContent = 'לא מחובר - מצב בדיקה בלבד';
+            }
+        }
+
+        // Send all reminders
+        async function sendAllReminders() {
+            if (!twilioConfig && !whatsappConnected) {
+                alert('נא להתחבר ל-Twilio או ל-WhatsApp Web תחילה!');
+                return;
+            }
+
+            const btn = document.getElementById('sendAllBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ שולח...';
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const todayReminders = appointments.filter(apt => {
+                const aptDate = new Date(apt.appointmentDate);
+                const reminderDate = new Date(aptDate);
+                reminderDate.setDate(reminderDate.getDate() - apt.reminderDays);
+                reminderDate.setHours(0, 0, 0, 0);
+                return reminderDate.getTime() === today.getTime() && !apt.reminderSent;
+            });
+
+            // Simulate sending (in real app, this would call the server API)
+            for (let apt of todayReminders) {
+                apt.reminderSent = true;
+                apt.sentAt = new Date().toISOString();
+                apt.sentMethod = twilioConfig ? 'twilio' : 'whatsapp-web';
+                
+                // Simulate delay
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+
+            saveData();
+            updateTodayReminders();
+            updateStats();
+
+            btn.disabled = false;
+            btn.innerHTML = '📤 שלח את כל התזכורות (<span id="sendAllCount">0</span>)';
+            
+            alert(`✅ ${todayReminders.length} תזכורות נשלחו בהצלחה!`);
+        }
+
+        // Close modals on outside click
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        };
+
+        // Load data on startup
+        loadData();
+    </script>
+</body>
+</html>

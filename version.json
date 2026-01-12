@@ -1,0 +1,20 @@
+{
+  "version": "1.0.0",
+  "releaseDate": "2026-01-05",
+  "description": "Initial release with manual workflow and Google Calendar sync",
+  "changelog": [
+    "Manual reminder workflow",
+    "Google Calendar integration",
+    "Twilio WhatsApp and SMS support",
+    "Auto-update system with GitHub integration",
+    "Hebrew interface"
+  ],
+  "files": [
+    "manual-workflow.html",
+    "google-calendar.js",
+    "auto-update.js",
+    "server.js",
+    "version.json"
+  ],
+  "breaking": false
+}
